@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://intelligent-operating-room-scheduling.onrender.com/:path*"
+    }
+  ]
+}
