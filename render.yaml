@@ -2,7 +2,7 @@ services:
   - type: web
     name: or-scheduling-api
     runtime: python
-    rootDir: backend
+    rootDir: .
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
