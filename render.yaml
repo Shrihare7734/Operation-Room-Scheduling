@@ -3,22 +3,9 @@ services:
     name: or-scheduling-api
     runtime: python
     rootDir: .
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && cd frontend && npm ci && npm run build
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.3
 
-  - type: web
-    name: or-scheduling-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm ci && npm run build
-    staticPublishPath: dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        sync: false

@@ -1,12 +1,14 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from pathlib import Path
 
 from db import add_patient, delete_patient, get_all_patients, get_rooms, get_surgeons, init_db
 from scheduler import build_schedule, handle_emergency, total_cost, validate_time_window
 from seed import seed_database
 
 app = Flask(__name__)
+FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -26,6 +28,8 @@ if not get_all_patients():
 
 @app.route("/", methods=["GET"])
 def index():
+    if (FRONTEND_DIST / "index.html").exists():
+        return send_from_directory(FRONTEND_DIST, "index.html")
     return jsonify({
         "message": "OR Scheduling Engine API",
         "routes": ["/patients", "/schedule", "/emergency", "/rooms", "/surgeons"],
@@ -112,6 +116,16 @@ def rooms():
 @app.route("/surgeons", methods=["GET"])
 def surgeons():
     return jsonify({"surgeons": get_surgeons()})
+
+
+@app.route("/<path:path>", methods=["GET"])
+def frontend_assets(path):
+    requested_file = FRONTEND_DIST / path
+    if requested_file.is_file():
+        return send_from_directory(FRONTEND_DIST, path)
+    if (FRONTEND_DIST / "index.html").exists():
+        return send_from_directory(FRONTEND_DIST, "index.html")
+    return jsonify({"error": "Frontend build not found."}), 404
 
 
 if __name__ == "__main__":
