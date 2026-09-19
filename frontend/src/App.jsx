@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ScheduleGrid from './ScheduleGrid';
 import PatientForm from './PatientForm';
-import { deletePatient, getResources } from './api';
+import { API_BASE, deletePatient, getResources } from './api';
 
 const formatDate = (date) => {
   const year = date.getFullYear();
@@ -26,9 +26,9 @@ export default function App() {
   };
 
   const loadSchedule = async (dateValue = selectedDateValue) => {
-    const patientsResponse = await fetch('/api/patients');
+    const patientsResponse = await fetch(`${API_BASE}/patients`);
     const data = await patientsResponse.json();
-    const scheduleResponse = await fetch('/api/schedule', {
+    const scheduleResponse = await fetch(`${API_BASE}/schedule`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ patients: data.patients || [], date: dateValue }),

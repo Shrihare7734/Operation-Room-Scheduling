@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { addPatient } from './api';
+import { API_BASE, addPatient } from './api';
 
 const equipmentOptions = ['Laparoscopy set', 'Ultrasound machine', 'Orthopedic drill', 'ECG monitor', 'Enhanced surgical lights'];
 
@@ -40,7 +40,7 @@ export default function PatientForm({ currentSchedule, selectedDate, resources, 
       const earliestDateTime = `${selectedDate}T${form.earliest_start_time}:00`;
       const latestDateTime = `${selectedDate}T${form.latest_end_time}:00`;
       const payload = { ...form, earliest_start_time: earliestDateTime, latest_end_time: latestDateTime, preferred_date: selectedDate, duration: Number(form.estimated_min_duration) || 30, estimated_min_duration: Number(form.estimated_min_duration) || 30, estimated_max_duration: Number(form.estimated_max_duration) || 60, k: Number(form.k), status: emergency ? 'emergency' : 'waiting', equipment: form.equipment.join(', '), arrival_time: earliestDateTime };
-      const response = emergency ? await fetch('/api/emergency', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ current_schedule: currentSchedule, emergency_patient: payload }) }).then((result) => result.json()) : await addPatient(payload);
+      const response = emergency ? await fetch(`${API_BASE}/emergency`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ current_schedule: currentSchedule, emergency_patient: payload }) }).then((result) => result.json()) : await addPatient(payload);
       if (response.error) throw new Error(response.error);
       await reloadSchedule();
       setForm(makeForm(selectedDate));
